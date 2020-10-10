@@ -1,0 +1,144 @@
+1. View menu Item List Admin (TYUC001) 
+
+SQL>
+create table menu_item(
+id int  Auto_Increment primary key not null,
+name varchar(30),
+price decimal(5,2),
+active varchar(10),
+dateoflaunch date,
+category varchar(30),
+free_delivery varchar(10)
+);
+
+Frame insert scripts to add data into menu_item table. Refer View menu Item List Admin screen below for sample data. 
+
+SQL>Insert into menu_item(name,price,active,dateoflaunch,category,free_delivery) values('Sandwich','99.00','Yes','2017/03/15','main Course','Yes');
+SQL>Insert into menu_item(name,price,active,dateoflaunch,category,free_delivery) values('Burger','129.00','Yes','2017/12/23','main Course','No');
+SQL>Insert into menu_item(name,price,active,dateoflaunch,category,free_delivery) values('Pizza','149.00','Yes','2017/08/21','main Course','No');
+SQL>Insert into menu_item(name,price,active,dateoflaunch,category,free_delivery) values('French Fries','57.00','No','2017/07/02','Starters','Yes');
+SQL>Insert into menu_item(name,price,active,dateoflaunch,category,free_delivery) values('Chocolate Brownie','32.00','Yes','2022/11/02','Desert','Yes');
+
+
+Frame SQL query to get all menu items.
+SQL>select * from menu_item;
+
+id	name		   price	active	dateoflaunch	category	free_delivery
+1	Sandwich	   99.00  	Yes	2017-03-15	main Course	Yes
+2	Burger		   129.00  	Yes	2017-12-23	main Course	No
+3	Pizza		   149.00	Yes	2017-08-21	main Course	No
+4	French Fries	   57.00	No	2017-07-02	Starters	Yes
+5	Chocolate Brownie  32.00	Yes	2022-11-02	Desert		Yes
+
+
+2. View menu Item List Customer (TYUC002) 
+
+Frame SQL query to get all menu items which after launch date and is active. 
+SQL>select name,free_delivery,price,Category from menu_item where active='Yes' and dateoflaunch < '2020-10-10';
+
+name		free_delivery	price		Category
+Sandwich	Yes		99.00		main Course
+Burger		No		129.00		main Course
+Pizza		No		149.00		main Course
+
+
+
+3. Edit menu Item (TYUC003) 
+
+Frame SQL query to get a menu items based on menu Item Id 
+SQL>select * from menu_item where id=1;
+
+id	name		price		active	dateoflaunch	category	free_delivery
+1	Sandwich	99.00		Yes	2017-03-15	main Course	Yes
+
+
+Frame update SQL menu_items table to update all the columns values based on menu Item Id 
+SQL>update menu_item set price='97.00', dateoflaunch='2017-05-20' where id='1';
+
+id	name		price	active	dateoflaunch	category	free_delivery
+1	Sandwich	97.00	Yes	2017-05-20	main Course	Yes
+
+
+
+4. Add to Cart (TYUC004) 
+Frame insert scripts for adding data into user and cart tables.In user table create two users. Once user will not have any entries in cart, while the other will have at least 3 items in the cart. 
+
+SQL>create table users(
+	id int Auto_Increment primary key not null,
+	name varchar(20),
+	email varchar(20),
+	phone_no bigint
+   );
+
+Insert into users(name,email,phone_no) values('John','john12@gmail.com','6546732567');
+Insert into users(name,email,phone_no) values('Jahan','johan12@gmail.com','65456788923');
+
+SQL>select * from users;
+id	name	email			phone_no
+1	John	john12@gmail.com	6546732567
+2	Jahan	johan12@gmail.com	65456788923
+
+
+SQL>create table cart (
+	id int Auto_Increment primary key not null,
+	user_id int,
+	product_id int,
+	FOREIGN KEY (user_id) REFERENCES users(id),
+	FOREIGN KEY (product_id) REFERENCES menu_item(id)
+   );
+
+
+SQL>insert into cart(user_id,product_id) values('1','1');
+SQL>insert into cart(user_id,product_id) values('1','2');
+SQL>insert into cart(user_id,product_id) values('1','3');
+
+SQL>select * from cart;
+
+id	user_id	  product_id
+1	1	  1
+2	1	  2
+3	1	  3
+
+
+5. View Cart (TYUC005) 
+
+a. Frame SQL query to get all menu items in a particular user’s cart 
+
+SQL>select m.name, m.free_delivery, m.price from
+    menu_item as m inner join cart as c on c.product_id=m.id
+    inner join users as u on c.user_id=u.id
+    where u.id=1;
+
+name	  free_delivery	  mrice
+Sandwich	Yes	  97.00
+Burger		No	  129.00
+Pizza		No	  149.00
+
+
+b. Frame SQL query to get the total price of all menu items in a marticular user’s cart 
+SQL>select sum(m.price) as Totalprice from
+    menu_item as m inner join cart as c on c.product_id=m.id
+    inner join users as u on c.user_id=u.id
+    where u.id=1;
+
+Totalprice
+375.00
+
+
+6. Remove Item from Cart (TYUC006) 
+a. Frame SQL query to remove a menu items from Cart based on User Id and menu Item Id 
+
+SQL>delete from cart where id=3;
+
+SQL>select m.name, m.free_delivery, m.price from
+    menu_item as m inner join cart as c on c.product_id=m.id
+    inner join users as u on c.user_id=u.id
+    where u.id=1;
+ 
+name	free_delivery	price
+Sandwich	Yes	97.00
+Burger		No	129.00
+
+
+
+
